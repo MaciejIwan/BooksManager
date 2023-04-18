@@ -10,7 +10,7 @@ use Symfony\Component\HttpFoundation\Response;
 class HomeControllerTest extends WebTestCase
 {
 
-    public function testSecured()
+    public function test_success_on_secured_endpoint()
     {
 
         $client = static::createClient();
@@ -23,8 +23,18 @@ class HomeControllerTest extends WebTestCase
 
         $client->request('GET', '/api/v1/secured');
 
-        // Assert that the response is successful and contains the expected JSON message
         $this->assertResponseIsSuccessful();
         $this->assertSame('{"GoodJob?":"Develito!"}', $client->getResponse()->getContent());
+    }
+
+    public function test_failed_when_call_secured_endpoint(): void
+    {
+
+        $client = static::createClient();
+
+        $client->request('GET', '/api/v1/secured');
+
+        $this->assertResponseStatusCodeSame(Response::HTTP_UNAUTHORIZED);
+        $this->assertSame('{"code":401,"message":"JWT Token not found"}', $client->getResponse()->getContent());
     }
 }

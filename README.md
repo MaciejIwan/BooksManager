@@ -31,7 +31,7 @@ php bin/console doctrine:schema:update --force
 ```
 
 
-
+Prepare the test database
 ```shell
 php bin/console --env=test doctrine:database:create
 php bin/console --env=test doctrine:schema:create
