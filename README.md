@@ -16,3 +16,24 @@ symfony serve
 php bin/console lexik:jwt:generate-keypair
 ```
 
+```shell
+php bin/console doctrine:database:create
+```
+
+```shell
+
+php bin/console make:migration
+php bin/console doctrine:migrations:migrate
+```
+
+```shell
+php bin/console doctrine:schema:update --force
+```
+
+
+
+```shell
+php bin/console --env=test doctrine:database:create
+php bin/console --env=test doctrine:schema:create
+php bin/console --env=test doctrine:fixtures:load
+```

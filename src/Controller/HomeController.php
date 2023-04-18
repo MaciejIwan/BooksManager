@@ -16,12 +16,11 @@ class HomeController extends AbstractController
         ]);
     }
 
-    #[Route('api/v1/', name: 'secured')]
+    #[Route('api/v1/secured', name: 'secured')]
     public function secured(): Response
     {
         $message = [
             'GoodJob?' => 'Develito!',
-            'GoodEmployee' => 'Maciej'
         ];
         return $this->json($message);
     }
