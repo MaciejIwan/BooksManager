@@ -30,7 +30,9 @@ class BookReview
     #[ORM\Column(length: 500)]
     private ?string $author = null;
 
-
+    #[ORM\ManyToOne(targetEntity: Book::class, inversedBy: 'reviews')]
+    #[ORM\JoinColumn(nullable: false)]
+    private Book $book;
     #[ORM\Column(length: 180, unique: true)]
     private ?string $email = null;
 
@@ -43,7 +45,7 @@ class BookReview
      * @param string|null $email
      * @return BookReview
      */
-    public function setEmail(?string $email): BookReview
+    public function setEmail(?string $email): self
     {
         $this->email = $email;
         return $this;
@@ -87,6 +89,17 @@ class BookReview
     {
         $this->author = $author;
 
+        return $this;
+    }
+
+    public function getBook(): Book
+    {
+        return $this->book;
+    }
+
+    public function setBook($book): self
+    {
+        $this->book = $book;
         return $this;
     }
 }

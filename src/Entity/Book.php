@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Entity\Trait\HasTimestamps;
 use App\Repository\BookRepository;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Entity(repositoryClass: BookRepository::class)]
@@ -30,6 +31,35 @@ class Book
     #[ORM\Column(length: 13)]
     private ?string $ISBN ;
 
+    #[Assert\NotBlank]
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'books')]
+    #[ORM\JoinColumn(nullable: false)]
+    private User $author;
+
+    #[ORM\OneToMany(mappedBy: 'book', targetEntity: BookReview::class)]
+    #[ORM\JoinColumn(nullable: false)]
+    private Collection $reviews;
+
+    public function getReviews(): Collection
+    {
+        return $this->reviews;
+    }
+    public function addReview(BookReview $review): Book
+    {
+        $review->setBook($this);
+        $this->reviews->add($review);
+        return $this;
+    }
+    public function getAuthor(): User
+    {
+        return $this->author;
+    }
+
+    public function setAuthor(User $author): Book
+    {
+        $this->author = $author;
+        return $this;
+    }
     public function getId(): ?int
     {
         return $this->id;
@@ -71,15 +101,6 @@ class Book
         return $this;
     }
 
-    public function getCreatedAt(): ?\DateTimeInterface
-    {
-        return $this->createdAt;
-    }
 
-    public function setCreatedAt(\DateTimeInterface $createdAt): self
-    {
-        $this->createdAt = $createdAt;
 
-        return $this;
-    }
 }

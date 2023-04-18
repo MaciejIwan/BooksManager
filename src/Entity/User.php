@@ -3,13 +3,17 @@
 namespace App\Entity;
 
 use App\Repository\UserRepository;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\Common\Collections\Collection;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: '`user`')]
+#[UniqueEntity(fields: ['email'], message: 'There is already an account with this email')]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
@@ -29,6 +33,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private string $lastName;
 
     #[Assert\NotBlank]
+    #[Assert\Email]
     #[ORM\Column(length: 180, unique: true)]
     private ?string $email = null;
 
@@ -39,7 +44,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private array $roles = [];
 
+    #[ORM\OneToMany(mappedBy: 'author', targetEntity: Book::class)]
+    private Collection $books;
 
+    public function __construct()
+    {
+        $this->items = new ArrayCollection();
+    }
     public function getLastName(): string
     {
         return $this->lastName;
@@ -86,7 +97,15 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
         return $this;
     }
+    public function addBook(Book $book): self
+    {
+        if (!$this->books->contains($book)) {
+            $this->books->add($book);
+            $book->setAuthor($this);
+        }
 
+        return $this;
+    }
     /**
      * A visual identifier that represents this user.
      *
