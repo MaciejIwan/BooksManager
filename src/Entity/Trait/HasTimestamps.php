@@ -34,7 +34,7 @@ trait HasTimestamps
         return $this->updatedAt;
     }
 
-    public function setUpdatedAt(DateTime $updatedAt): Order
+    public function setUpdatedAt(DateTime $updatedAt): self
     {
         $this->updatedAt = $updatedAt;
         return $this;

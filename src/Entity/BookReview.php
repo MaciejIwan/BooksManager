@@ -56,12 +56,12 @@ class BookReview
         return $this->id;
     }
 
-    public function getRating(): ?int
+    public function getRating(): ?BookReviewStars
     {
         return $this->rating;
     }
 
-    public function setRating(int $rating): self
+    public function setRating(BookReviewStars $rating): self
     {
         $this->rating = $rating;
 
@@ -85,7 +85,7 @@ class BookReview
         return $this->author;
     }
 
-    public function setAuthor(?User $author): self
+    public function setAuthor(String $author): self
     {
         $this->author = $author;
 

@@ -18,9 +18,9 @@ class UserService
     private UserPasswordHasherInterface $userPasswordHasher;
 
     public function __construct(
-        EntityManagerInterface $entityManager,
-                                UserRepository $userRepository,
-                                UserPasswordHasherInterface $userPasswordHasher,
+        EntityManagerInterface      $entityManager,
+        UserRepository              $userRepository,
+        UserPasswordHasherInterface $userPasswordHasher,
     )
     {
         $this->entityManager = $entityManager;
@@ -36,7 +36,7 @@ class UserService
 
     public function addUser(RegisterUserData $userData): User
     {
-        if($this->isEmailTaken($userData->getEmail())){
+        if ($this->isEmailTaken($userData->getEmail())) {
             throw new EmailTakenException('This email address is already registered.');
         }
 

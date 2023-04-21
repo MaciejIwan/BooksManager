@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
@@ -23,5 +24,16 @@ class HomeController extends AbstractController
             'GoodJob?' => 'Develito!',
         ];
         return $this->json($message);
+    }
+
+    #[Route('/api/v1/book/my', name: 'user_books', methods: ['GET'])]
+    public function getMyBooks(): JsonResponse
+    {
+        echo "debug 1 ";
+        $user = $this->getUser();
+        echo "debug 1 ";
+        $books = $user->getBooks();
+
+        return $this->json($books);
     }
 }
