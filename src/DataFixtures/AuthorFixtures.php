@@ -32,6 +32,15 @@ class AuthorFixtures extends Fixture
 
         $this->userRepository->save($user, true);
 
+        $user2 = new User();
+        $user2->setFirstName('John');
+        $user2->setLastName('Doe');
+        $user2->setEmail('test2@test.com');
+        $user2->setPassword('$2y$13$4BUvmN.6oMMH4PrS7d37OuJX.gXNlGe1CvBS2ClobCRBZWz.UlFGe'); // 1234
+        $user2->setRoles(['ROLE_USER', 'ROLE_AUTHOR']);
+
+        $this->userRepository->save($user2, true);
+
         $book1 = new Book();
         $book1->setTitle('The Book without reviews');
         $book1->setAuthor($user);

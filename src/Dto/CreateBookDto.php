@@ -10,11 +10,11 @@ use Symfony\Component\HttpFoundation\Request;
 class CreateBookDto
 {
     public function __construct(
-        public string    $title,
-        public User      $author,
-        public string    $description,
-        public string    $isbn,
-        public \DateTime $createdAt,
+        public readonly string    $title,
+        public readonly User      $author,
+        public readonly string    $description,
+        public readonly string    $isbn,
+        public readonly \DateTime $createdAt,
     )
     {
     }

@@ -30,7 +30,10 @@ php bin/console doctrine:migrations:migrate
 php bin/console doctrine:schema:update --force
 ```
 
-
+DROP test database
+```shell
+php bin/console --env=test doctrine:database:drop --force
+```
 Prepare the test database
 ```shell
 php bin/console --env=test doctrine:database:create

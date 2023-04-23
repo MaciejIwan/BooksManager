@@ -40,7 +40,7 @@ class BookController extends AbstractController
 
 
     #[Route("/", name: "user_create_book", methods: ["POST"])]
-    public function addBook(Request $request, EntityManagerInterface $entityManager): JsonResponse
+    public function addBook(Request $request): JsonResponse
     {
         $user = $this->getUser();
 
@@ -58,11 +58,11 @@ class BookController extends AbstractController
     {
         $book = $bookRepository->findOneBy([
             'id' => $id,
-            'user' => $this->getUser(),
+            'author' => $this->getUser(),
         ]);
 
         if (!$book) {
-            return $this->json(['error' => 'Book not found.'], Response::HTTP_NOT_FOUND);
+            return $this->json(['error' => 'You dont have permissions to edit book or book does not exist '], Response::HTTP_NOT_FOUND);
         }
 
         $jsonData = $request->getContent();

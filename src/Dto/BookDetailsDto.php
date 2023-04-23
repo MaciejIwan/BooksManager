@@ -12,13 +12,13 @@ use Doctrine\Common\Collections\Collection;
 class BookDetailsDto
 {
     public function __construct(
-        public int $id,
-        public string $title,
-        public User $author,
-        public string $description,
-        public string $isbn,
-        public \DateTime $createdAt,
-        public Collection $reviews
+        public readonly int $id,
+        public readonly string $title,
+        public readonly User $author,
+        public readonly string $description,
+        public readonly string $isbn,
+        public readonly \DateTime $createdAt,
+        public readonly Collection $reviews
     )
     {
     }
