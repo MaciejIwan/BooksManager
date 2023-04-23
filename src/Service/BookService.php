@@ -21,7 +21,7 @@ class BookService
     {
     }
 
-    public function getBookDetails(int $id): BookDetailsDto
+    public function getBook(int $id): Book
     {
         $book = $this->bookRepository->findOneBy([
             'id' => $id,
@@ -31,7 +31,7 @@ class BookService
             throw new \Exception('Book not found', Response::HTTP_NOT_FOUND);
         }
 
-        return BookDetailsDto::fromEntity($book);
+        return $book;
     }
 
     public function deleteBookOwnByUser(int $id, UserInterface $user)
@@ -69,6 +69,19 @@ class BookService
         $book->setISBN($fromRequest->isbn);
 
         $this->bookRepository->save($book, true);
+    }
+
+    public function findBookById(int $bookId)
+    {
+        $book = $this->bookRepository->findOneBy([
+            'id' => $bookId,
+        ]);
+
+        if (!$book) {
+            throw new EntityNotFoundException('Book not found.');
+        }
+
+        return $book;
     }
 
 

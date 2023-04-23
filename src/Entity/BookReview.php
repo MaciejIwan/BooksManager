@@ -6,6 +6,7 @@ use App\Entity\Trait\HasTimestamps;
 use App\Enum\BookReviewStars;
 use App\Repository\BookReviewRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: BookReviewRepository::class)]
@@ -19,20 +20,22 @@ class BookReview
     #[ORM\Column]
     private ?int $id = null;
 
-
+    #[Groups(['book:details:read'])]
     #[ORM\Column(enumType: BookReviewStars::class)]
     private ?BookReviewStars $rating = null;
 
+    #[Groups(['book:details:read'])]
     #[Assert\NotBlank(message: 'Description is required')]
     #[ORM\Column(length: 500)]
     private ?string $description = null;
 
+    #[Groups(['book:details:read'])]
     #[Assert\NotBlank(message: 'Author is required')]
     #[ORM\Column(length: 500)]
     private ?string $author = null;
 
-    #[ORM\ManyToOne(targetEntity: Book::class, inversedBy: 'reviews')]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\ManyToOne(targetEntity: Book::class, cascade: ['persist'], inversedBy: 'reviews')]
+    #[ORM\JoinColumn(name: 'book_id', referencedColumnName: 'id', nullable: false)]
     private Book $book;
     #[ORM\Column(length: 180, unique: true)]
     private ?string $email = null;
@@ -98,7 +101,12 @@ class BookReview
         return $this->book;
     }
 
-    public function setBook($book): self
+    #[Groups(['book:details:read'])]
+    public function getBookId(): int
+    {
+        return $this->book->getId();
+    }
+    public function setBook(Book $book): self
     {
         $this->book = $book;
         return $this;

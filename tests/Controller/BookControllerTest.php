@@ -2,6 +2,7 @@
 
 namespace App\Tests\Controller;
 
+use App\Enum\BookReviewStars;
 use App\Repository\BookRepository;
 use App\Repository\UserRepository;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
@@ -170,13 +171,69 @@ class BookControllerTest extends WebTestCase
         $this->assertNotNull($this->bookRepository->findOneBy(['title' => $bookTitle]));
     }
 
-    public function test_it_should_return_book_details(){
+    public function test_it_should_return_book_details()
+    {
         $bookTitle = 'The Book with reviews';
         $book = $this->bookRepository->findOneBy(['title' => $bookTitle]); // todo it should be accessible from Fixture or some static way
+        $expectedBookJson = $this->serializer->serialize($book, 'json', [
+            'groups' => ['book:details:read'],
+        ]);
 
         $this->client->request('GET', '/api/v1/books/' . $book->getId());
-        $response = $this->client->getResponse()->getContent();
-        echo $response;
+
+        $actualBookJson = $this->client->getResponse()->getContent();
+        $this->assertResponseStatusCodeSame(Response::HTTP_OK);
+        $this->AssertJsonStringEqualsJsonString($expectedBookJson, $actualBookJson);
+        $this->assertTrue(sizeof($book->getReviews()) > 0);
+    }
+
+    public function test_it_should_return_list_of_books(): void
+    {
+        $this->client->request('GET', '/api/v1/books/list/1');
+
+        $response = $this->client->getResponse();
+        $this->assertSame(Response::HTTP_OK, $response->getStatusCode());
+        $res = json_decode($response->getContent(), true);
+        $this->assertCount(10, $res);
+        $this->assertSame('The Book without reviews', $res[0]['title']);
+    }
+
+    public function test_it_should_return_proper_page_from_list(): void
+    {
+        $this->client->request('GET', '/api/v1/books/list/2');
+        $response = $this->client->getResponse();
+        $this->assertSame(Response::HTTP_OK, $response->getStatusCode());
+        $res = json_decode($response->getContent(), true);
+        $this->assertCount(10, $res);
+        $this->assertNotSame('The Book with reviews', $res[0]['title']);
+    }
+
+    public function test_it_should_add_review_to_book()
+    {
+        $bookTitle = 'The Book without reviews';
+        $book = $this->bookRepository->findOneBy(['title' => $bookTitle]);
+
+        $reviewData = [
+            'author' => 'Test Author',
+            'rating' => 5,
+            'description' => 'This is an example book from test',
+            'email' => 'sendNotifination@here.com'
+        ];
+
+        $testUser = $this->userRepository->findOneByEmail('test@test.com');
+        $this->client->loginUser($testUser);
+
+
+        $this->client->request('POST', '/api/v1/books/book/' . $book->getId() . '/reviews', $reviewData);
+
+
+        $this->assertResponseStatusCodeSame(Response::HTTP_CREATED);
+        $this->assertEquals(1, $book->getReviews()->count());
+        $this->assertSame($reviewData['author'], $book->getReviews()->first()->getAuthor());
+        $this->assertSame(BookReviewStars::fromValue($reviewData['rating']), $book->getReviews()->first()->getRating());
+        $this->assertSame($reviewData['description'], $book->getReviews()->first()->getDescription());
+        $this->assertSame($reviewData['email'], $book->getReviews()->first()->getEmail());
+
     }
 
 }

@@ -19,25 +19,25 @@ class Book
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['book:read'])]
+    #[Groups(['book:read', 'book:details:read'])]
     private ?int $id = null;
 
     #[Assert\NotBlank]
     #[Assert\Length(min: 1, max: 200, minMessage: 'Title must be at least 1 character', maxMessage: 'Title must be less than 200 characters')]
     #[ORM\Column(length: 200)]
-    #[Groups(['book:read'])]
+    #[Groups(['book:read', 'book:details:read'])]
     private ?string $title = null;
 
     #[Assert\NotBlank]
     #[Assert\Length(min: 1, minMessage: 'Description must be at least 1 character')]
     #[ORM\Column(type: 'text')]
-    #[Groups(['book:read'])]
+    #[Groups(['book:read', 'book:details:read'])]
     private ?string $description;
 
     #[Assert\NotBlank]
     #[Assert\Length(min: 4, max: 13, exactMessage: 'ISBN must be have least 4 and max 13 characters')]
     #[ORM\Column(length: 13)]
-    #[Groups(['book:read'])]
+    #[Groups(['book:read', 'book:details:read'])]
     private ?string $ISBN;
 
     #[Assert\NotBlank]
@@ -45,9 +45,10 @@ class Book
     #[ORM\JoinColumn(nullable: false)]
     private User $author;
 
-    #[ORM\OneToMany(mappedBy: 'book', targetEntity: BookReview::class)]
+    #[ORM\OneToMany(mappedBy: 'book', targetEntity: BookReview::class, cascade: ['persist', 'remove'], fetch: 'EAGER', orphanRemoval: true)]
     #[ORM\JoinColumn(nullable: false)]
-    private Collection $reviews;
+    #[Groups(['book:details:read'])]
+    private Collection  $reviews;
 
     public function __construct()
     {
@@ -61,8 +62,10 @@ class Book
 
     public function addReview(BookReview $review): Book
     {
-        $review->setBook($this);
-        $this->reviews->add($review);
+        if (!$this->reviews->contains($review)) {
+            $this->reviews->add($review);
+            $review->setBook($this);
+        }
         return $this;
     }
 
@@ -74,6 +77,11 @@ class Book
     public function getAuthorId(): int
     {
         return $this->author->getId();
+    }
+    #[Groups(['book:details:read'])]
+    public function getAuthorName(): string
+    {
+        return $this->author->getFirstName() . ' ' . $this->author->getLastName();
     }
 
     public function setAuthor(User $author): Book

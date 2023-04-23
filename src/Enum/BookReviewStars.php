@@ -2,7 +2,10 @@
 
 namespace App\Enum;
 
-enum BookReviewStars: int {
+use InvalidArgumentException;
+
+enum BookReviewStars: int
+{
     case ONE = 1;
     case TWO = 2;
     case THREE = 3;
@@ -27,6 +30,26 @@ enum BookReviewStars: int {
             self::EIGHT => '8',
             self::NINE => '9',
             self::TEN => '10',
+        };
+    }
+
+    public static function fromValue(int $value): self
+    {
+        if ($value < 1 || $value > 10) {
+            throw new InvalidArgumentException('Invalid rating value: ' . $value);
+        }
+
+        return match ($value) {
+            1 => self::ONE,
+            2 => self::TWO,
+            3 => self::THREE,
+            4 => self::FOUR,
+            5 => self::FIVE,
+            6 => self::SIX,
+            7 => self::SEVEN,
+            8 => self::EIGHT,
+            9 => self::NINE,
+            10 => self::TEN,
         };
     }
 }
