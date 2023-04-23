@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Service;
 
 use App\Dto\BookDetailsDto;
+use App\Dto\CreateBookDto;
+use App\Entity\Book;
 use App\Entity\User;
 use App\Repository\BookRepository;
 use Doctrine\ORM\EntityNotFoundException;
@@ -56,6 +58,17 @@ class BookService
         return $this->bookRepository->findBy([
             'author' => $user,
         ]);
+    }
+
+    public function addBookToUser(CreateBookDto $fromRequest)
+    {
+        $book = new Book();
+        $book->setTitle($fromRequest->title);
+        $book->setDescription($fromRequest->description);
+        $book->setAuthor($fromRequest->author);
+        $book->setISBN($fromRequest->isbn);
+
+        $this->bookRepository->save($book, true);
     }
 
 

@@ -20,7 +20,7 @@ trait HasTimestamps
     private DateTime $updatedAt;
 
     #[PrePersist, PreUpdate]
-    public function updateTimestamps(LifecycleEventArgs $args): void
+    public function updateTimestamps(): void
     {
         if (!isset($this->createdAt)) {
             $this->createdAt = new DateTime();

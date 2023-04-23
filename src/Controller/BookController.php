@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Dto\CreateBookDto;
 use App\Entity\Book;
 use App\Entity\User;
 use App\Repository\BookRepository;
@@ -12,14 +13,13 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\SerializerInterface;
 
 #[Route('/api/v1/book')]
 class BookController extends AbstractController
 {
     public function __construct(
-        private readonly BookService $bookService,
+        private readonly BookService         $bookService,
         private readonly SerializerInterface $serializer
     )
     {
@@ -49,20 +49,8 @@ class BookController extends AbstractController
         }
 
         //todo validate data from user
-        $title = $request->request->get('title');
-        $description = $request->request->get('description');
-        $isbn = $request->request->get('isbn');
-
-        $book = new Book();
-        $book->setTitle($title);
-        $book->setDescription($description);
-        $book->setAuthor($user);
-        $book->setISBN($isbn);
-
-        $entityManager->persist($book);
-        $entityManager->flush();
-
-        return new JsonResponse(['book' => $book], Response::HTTP_CREATED);
+        $this->bookService->addBookToUser(CreateBookDto::fromRequest($request, $user));
+        return new JsonResponse(['ok' => "book added successfully"], Response::HTTP_CREATED);
     }
 
     #[Route("/{id}", name: "update_book", methods: ["PATCH"])]
