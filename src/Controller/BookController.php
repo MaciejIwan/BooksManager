@@ -90,13 +90,13 @@ class BookController extends AbstractController
     {
 
         try {
-            $bookService->deleteUserBook($id, $this->getUser());
+            $bookService->deleteBookOwnByUser($id, $this->getUser());
         } catch (\Exception $e) {
             return $this->json(['error' => $e->getMessage()], Response::HTTP_BAD_REQUEST);
         }
 
 
-        return $this->json(null, Response::HTTP_NO_CONTENT);
+        return $this->json(null, Response::HTTP_OK);
     }
 
     //todo open this endpoint for everyone (turn off security)

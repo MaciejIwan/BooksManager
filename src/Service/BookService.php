@@ -34,7 +34,7 @@ class BookService
         return BookDetailsDto::fromEntity($book);
     }
 
-    public function deleteUserBook(int $id, UserInterface $user)
+    public function deleteBookOwnByUser(int $id, UserInterface $user)
     {
         $book = $this->bookRepository->findOneBy([
             'id' => $id,

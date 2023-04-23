@@ -142,5 +142,32 @@ class BookControllerTest extends WebTestCase
 
     }
 
+    public function test_it_should_delete_caller_book()
+    {
+        $bookTitle = 'The Book without reviews';
+
+        $book = $this->bookRepository->findOneBy(['title' => $bookTitle]);
+        $testUser = $this->userRepository->findOneByEmail('test@test.com');
+        $this->client->loginUser($testUser);
+
+        $this->client->request('DELETE', '/api/v1/book/' . $book->getId());
+
+        $this->assertResponseStatusCodeSame(Response::HTTP_OK);
+        $this->assertNull($this->bookRepository->findOneBy(['title' => $bookTitle]));
+    }
+
+    public function test_it_should_failed_when_not_onwer_delete_book()
+    {
+        $bookTitle = 'The Book without reviews';
+
+        $book = $this->bookRepository->findOneBy(['title' => $bookTitle]);
+        $testUser = $this->userRepository->findOneByEmail('test2@test.com');
+        $this->client->loginUser($testUser);
+
+        $this->client->request('DELETE', '/api/v1/book/' . $book->getId());
+
+        $this->assertResponseStatusCodeSame(Response::HTTP_BAD_REQUEST);
+        $this->assertNotNull($this->bookRepository->findOneBy(['title' => $bookTitle]));
+    }
 
 }
