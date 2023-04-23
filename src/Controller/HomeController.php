@@ -25,15 +25,4 @@ class HomeController extends AbstractController
         ];
         return $this->json($message);
     }
-
-    #[Route('/api/v1/book/my', name: 'user_books', methods: ['GET'])]
-    public function getMyBooks(): JsonResponse
-    {
-        echo "debug 1 ";
-        $user = $this->getUser();
-        echo "debug 1 ";
-        $books = $user->getBooks();
-
-        return $this->json($books);
-    }
 }

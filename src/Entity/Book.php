@@ -6,33 +6,40 @@ use App\Entity\Trait\HasTimestamps;
 use App\Repository\BookRepository;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
+
 #[ORM\Entity(repositoryClass: BookRepository::class)]
 class Book
 {
     use HasTimestamps;
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['book:read'])]
     private ?int $id = null;
 
     #[Assert\NotBlank]
     #[Assert\Length(min: 1, max: 200, minMessage: 'Title must be at least 1 character', maxMessage: 'Title must be less than 200 characters')]
     #[ORM\Column(length: 200)]
+    #[Groups(['book:read'])]
     private ?string $title = null;
 
     #[Assert\NotBlank]
     #[Assert\Length(min: 1, minMessage: 'Description must be at least 1 character')]
     #[ORM\Column(type: 'text')]
+    #[Groups(['book:read'])]
     private ?string $description;
 
     #[Assert\NotBlank]
     #[Assert\Length(min: 4, max: 13, exactMessage: 'ISBN must be have least 4 and max 13 characters')]
     #[ORM\Column(length: 13)]
-    private ?string $ISBN ;
+    #[Groups(['book:read'])]
+    private ?string $ISBN;
 
     #[Assert\NotBlank]
-    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'books')]
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'books')] # cascade: ['persist']
     #[ORM\JoinColumn(nullable: false)]
     private User $author;
 
@@ -44,15 +51,22 @@ class Book
     {
         return $this->reviews;
     }
+
     public function addReview(BookReview $review): Book
     {
         $review->setBook($this);
         $this->reviews->add($review);
         return $this;
     }
+
     public function getAuthor(): User
     {
         return $this->author;
+    }
+    #[Groups(['book:read'])]
+    public function getAuthorId(): int
+    {
+        return $this->author->getId();
     }
 
     public function setAuthor(User $author): Book
@@ -60,6 +74,7 @@ class Book
         $this->author = $author;
         return $this;
     }
+
     public function getId(): ?int
     {
         return $this->id;
@@ -76,7 +91,6 @@ class Book
 
         return $this;
     }
-
     public function getDescription(): ?string
     {
         return $this->description;
@@ -100,7 +114,6 @@ class Book
 
         return $this;
     }
-
 
 
 }

@@ -12,20 +12,30 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
+use Symfony\Component\Serializer\SerializerInterface;
 
-//#[Route('')]
+#[Route('/api/v1/book')]
 class BookController extends AbstractController
 {
+    public function __construct(
+        private readonly BookService $bookService,
+        private readonly SerializerInterface $serializer
+    )
+    {
+    }
 
-    #[Route('/api/v1/book/my', name: 'user_books', methods: ['GET'])]
+    #[Route('/my', methods: ['GET'])]
     public function getMyBooks(): JsonResponse
     {
-        echo "debug 1 ";
         $user = $this->getUser();
-        echo "debug 1 ";
-        $books = $user->getBooks();
+        $books = $this->bookService->findBooksByAuthor($user);
 
-        return $this->json($books);
+        $serializedBooks = $this->serializer->serialize($books, 'json', [
+            'groups' => ['book:read'],
+        ]);
+
+        return new JsonResponse($serializedBooks, Response::HTTP_OK, [], true);
     }
 
 

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Service;
 
 use App\Dto\BookDetailsDto;
+use App\Entity\User;
 use App\Repository\BookRepository;
 use Doctrine\ORM\EntityNotFoundException;
 use Symfony\Component\HttpFoundation\Response;
@@ -49,4 +50,13 @@ class BookService
         $this->bookRepository->remove($book, true);
 
     }
+
+    public function findBooksByAuthor(User $user): array
+    {
+        return $this->bookRepository->findBy([
+            'author' => $user,
+        ]);
+    }
+
+
 }
