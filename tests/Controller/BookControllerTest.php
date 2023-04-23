@@ -28,11 +28,12 @@ class BookControllerTest extends WebTestCase
         parent::setUp();
     }
 
-    public function test_success_on_get_my_books_endpoint()
+    public function test_it_should_return_my_books()
     {
 
-        $books = $this->bookRepository->findAll();
+
         $testUser = $this->userRepository->findOneByEmail('test@test.com');
+        $books = $this->bookRepository->findBy(['author' => $testUser->getId()]);
 
         $expectedResponse = $this->serializer->serialize($books, 'json', [
             'groups' => ['book:read'],
@@ -178,8 +179,12 @@ class BookControllerTest extends WebTestCase
         $expectedBookJson = $this->serializer->serialize($book, 'json', [
             'groups' => ['book:details:read'],
         ]);
+        $testUser = $this->userRepository->findOneByEmail('test2@test.com');
+        $this->client->loginUser($testUser);
+
 
         $this->client->request('GET', '/api/v1/books/' . $book->getId());
+
 
         $actualBookJson = $this->client->getResponse()->getContent();
         $this->assertResponseStatusCodeSame(Response::HTTP_OK);
@@ -189,7 +194,12 @@ class BookControllerTest extends WebTestCase
 
     public function test_it_should_return_list_of_books(): void
     {
+        $testUser = $this->userRepository->findOneByEmail('test2@test.com');
+        $this->client->loginUser($testUser);
+
+
         $this->client->request('GET', '/api/v1/books/list/1');
+
 
         $response = $this->client->getResponse();
         $this->assertSame(Response::HTTP_OK, $response->getStatusCode());
@@ -200,8 +210,14 @@ class BookControllerTest extends WebTestCase
 
     public function test_it_should_return_proper_page_from_list(): void
     {
+        $testUser = $this->userRepository->findOneByEmail('test2@test.com');
+        $this->client->loginUser($testUser);
+
+
         $this->client->request('GET', '/api/v1/books/list/2');
         $response = $this->client->getResponse();
+
+
         $this->assertSame(Response::HTTP_OK, $response->getStatusCode());
         $res = json_decode($response->getContent(), true);
         $this->assertCount(10, $res);
