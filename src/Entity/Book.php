@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Entity\Trait\HasTimestamps;
 use App\Repository\BookRepository;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
@@ -47,6 +48,11 @@ class Book
     #[ORM\OneToMany(mappedBy: 'book', targetEntity: BookReview::class)]
     #[ORM\JoinColumn(nullable: false)]
     private Collection $reviews;
+
+    public function __construct()
+    {
+        $this->reviews = new ArrayCollection();
+    }
 
     public function getReviews(): Collection
     {

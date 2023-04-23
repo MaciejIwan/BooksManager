@@ -3,7 +3,6 @@
 namespace App\Controller;
 
 use App\Dto\CreateBookDto;
-use App\Entity\Book;
 use App\Entity\User;
 use App\Repository\BookRepository;
 use App\Service\BookService;
@@ -15,7 +14,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Serializer\SerializerInterface;
 
-#[Route('/api/v1/book')]
+#[Route('/api/v1/books')]
 class BookController extends AbstractController
 {
     public function __construct(
@@ -100,12 +99,15 @@ class BookController extends AbstractController
     }
 
     //todo open this endpoint for everyone (turn off security)
-    #[Route('/details/{id}', name: 'book_details', methods: ['GET'])]
+    #[Route('/{id}', name: 'book_details', methods: ['GET'])]
     public function getDetails(int $id, BookService $bookService): JsonResponse
     {
         try {
             $bookDetails = $bookService->getBookDetails($id);
-            return $this->json($bookDetails);
+            $serializedBooks = $this->serializer->serialize($bookDetails, 'json', [
+                'groups' => ['book:review:read'],
+            ]);
+            return new JsonResponse($serializedBooks, Response::HTTP_OK, [], true);
         } catch (\Exception $e) {
             return $this->json(['error' => $e->getMessage()], Response::HTTP_BAD_REQUEST);
         }

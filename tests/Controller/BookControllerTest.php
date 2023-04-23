@@ -38,7 +38,7 @@ class BookControllerTest extends WebTestCase
         ]);
 
         $this->client->loginUser($testUser);
-        $this->client->request('GET', '/api/v1/book/my');
+        $this->client->request('GET', '/api/v1/books/my');
 
 
         $actualResponse = $this->client->getResponse()->getContent();
@@ -59,7 +59,7 @@ class BookControllerTest extends WebTestCase
         $this->client->loginUser($testUser);
 
 
-        $this->client->request('POST', '/api/v1/book/', $bookData);
+        $this->client->request('POST', '/api/v1/books/', $bookData);
 
 
         $this->assertResponseStatusCodeSame(Response::HTTP_CREATED);
@@ -83,7 +83,7 @@ class BookControllerTest extends WebTestCase
         $this->client->loginUser($testUser);
 
 
-        $this->client->request('PATCH', '/api/v1/book/' . $book->getId(), [], [], [], json_encode([
+        $this->client->request('PATCH', '/api/v1/books/' . $book->getId(), [], [], [], json_encode([
             'title' => $newTitle,
         ]));
 
@@ -106,7 +106,7 @@ class BookControllerTest extends WebTestCase
         $this->client->loginUser($testUser);
 
 
-        $this->client->request('PATCH', '/api/v1/book/' . $book->getId(), [], [], [], json_encode([
+        $this->client->request('PATCH', '/api/v1/books/' . $book->getId(), [], [], [], json_encode([
             'description' => $newDescription,
         ]));
 
@@ -128,7 +128,7 @@ class BookControllerTest extends WebTestCase
         $this->client->loginUser($testUser);
 
 
-        $this->client->request('PATCH', '/api/v1/book/' . $book->getId(), [], [], [], json_encode([
+        $this->client->request('PATCH', '/api/v1/books/' . $book->getId(), [], [], [], json_encode([
             'description' => "bad",
         ]));
 
@@ -150,7 +150,7 @@ class BookControllerTest extends WebTestCase
         $testUser = $this->userRepository->findOneByEmail('test@test.com');
         $this->client->loginUser($testUser);
 
-        $this->client->request('DELETE', '/api/v1/book/' . $book->getId());
+        $this->client->request('DELETE', '/api/v1/books/' . $book->getId());
 
         $this->assertResponseStatusCodeSame(Response::HTTP_OK);
         $this->assertNull($this->bookRepository->findOneBy(['title' => $bookTitle]));
@@ -164,10 +164,19 @@ class BookControllerTest extends WebTestCase
         $testUser = $this->userRepository->findOneByEmail('test2@test.com');
         $this->client->loginUser($testUser);
 
-        $this->client->request('DELETE', '/api/v1/book/' . $book->getId());
+        $this->client->request('DELETE', '/api/v1/books/' . $book->getId());
 
         $this->assertResponseStatusCodeSame(Response::HTTP_BAD_REQUEST);
         $this->assertNotNull($this->bookRepository->findOneBy(['title' => $bookTitle]));
+    }
+
+    public function test_it_should_return_book_details(){
+        $bookTitle = 'The Book with reviews';
+        $book = $this->bookRepository->findOneBy(['title' => $bookTitle]); // todo it should be accessible from Fixture or some static way
+
+        $this->client->request('GET', '/api/v1/books/' . $book->getId());
+        $response = $this->client->getResponse()->getContent();
+        echo $response;
     }
 
 }
