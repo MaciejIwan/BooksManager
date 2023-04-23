@@ -9,7 +9,6 @@ use App\Repository\BookRepository;
 use App\Service\BookReviewService;
 use App\Service\BookService;
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\Tools\Pagination\Paginator;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -61,32 +60,17 @@ class BookController extends AbstractController
     #[Route("/{id}", name: "update_book", methods: ["PATCH"])]
     public function updateBook(int $id, Request $request, BookRepository $bookRepository, EntityManagerInterface $em): JsonResponse
     {
-        $book = $bookRepository->findOneBy([
-            'id' => $id,
-            'author' => $this->getUser(),
-        ]);
+        try {
+            $jsonData = $request->getContent();
+            $data = json_decode($jsonData, true);
 
-        if (!$book) {
-            return $this->json(['error' => 'You dont have permissions to edit book or book does not exist '], Response::HTTP_NOT_FOUND);
+            $book = $this->bookService->updateBook($id, $this->getUser(), $data);
+
+            return new JsonResponse(['book' => $book]);
+        } catch (\Exception $e) {
+            return $this->json(['error' => $e->getMessage()], Response::HTTP_NOT_FOUND);
         }
 
-        $jsonData = $request->getContent();
-        $data = json_decode($jsonData, true);
-
-        //todo validate data from user / consider creating DTO
-        if (isset($data['title'])) {
-            $title = $data['title'];
-            $book->setTitle($title);
-        }
-
-        if (isset($data['description'])) {
-            $description = $data['description'];
-            $book->setDescription($description);
-        }
-
-        $em->flush();
-
-        return new JsonResponse(['book' => $book]);
     }
 
 
@@ -123,22 +107,10 @@ class BookController extends AbstractController
     public function index(int $page, BookRepository $bookRepository, Request $request): Response
     {
 
-        $title = $request->query->get('title', '');
-        $description = $request->query->get('description', '');
+        $title = $request->request->get('title', '');
+        $description = $request->request->get('description', '');
 
-        $booksQuery = $bookRepository->createQueryBuilder('b')
-            ->orderBy('b.createdAt', 'DESC')
-            ->where('b.title LIKE :title')
-            ->andWhere('b.description LIKE :description')
-            ->setParameter('title', '%' . $title . '%')
-            ->setParameter('description', '%' . $description . '%');
-
-        $paginator = new Paginator($booksQuery);
-        $paginator->getQuery()
-            ->setFirstResult(($page - 1) * 10)
-            ->setMaxResults(10);
-
-        $books = $paginator->getIterator()->getArrayCopy();
+        $books = $this->bookService->findBooks($title, $description, $page);
 
         if (empty($books)) {
             return $this->json(['error' => 'No books found'], Response::HTTP_NOT_FOUND);

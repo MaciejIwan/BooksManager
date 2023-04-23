@@ -43,9 +43,9 @@ class AuthorFixtures extends Fixture
         $user3 = new User();
         $user3->setFirstName('Kamil');
         $user3->setLastName('Dostojewski');
-        $user3->setEmail('test3@test.com');
+        $user3->setEmail('noroles@test.com');
         $user3->setPassword('$2y$13$4BUvmN.6oMMH4PrS7d37OuJX.gXNlGe1CvBS2ClobCRBZWz.UlFGe'); // 1234
-        $user3->setRoles(['ROLE_USER', 'ROLE_AUTHOR']);
+        $user3->setRoles([]);
 
         $this->userRepository->save($user3, true);
 

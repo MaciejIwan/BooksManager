@@ -20,9 +20,6 @@ class RegistrationController extends AbstractController
     #[Route('/register', name: 'app_register')]
     public function register(
         Request                    $request,
-
-        UserAuthenticatorInterface $userAuthenticator,
-        AppCustomAuthenticator     $authenticator,
         UserService                $userService,
         ValidatorInterface         $validator,
         SerializerInterface        $serializer

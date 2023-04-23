@@ -44,7 +44,7 @@ class UserService
         $user->setFirstName($userData->getFirstName());
         $user->setLastName($userData->getLastName());
         $user->setEmail($userData->getEmail());
-        $user->setRoles(['ROLE_AUTHOR']);
+        $user->setRoles(['ROLE_USER']);
 
         $user->setPassword(
             $this->userPasswordHasher->hashPassword(
